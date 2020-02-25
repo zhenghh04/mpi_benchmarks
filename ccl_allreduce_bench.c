@@ -17,9 +17,11 @@
 #include "base.h"
 #include "stdlib.h"
 #include "string.h"
+#include "math.h"
 #define RUN_COLLECTIVE(start_cmd, count, name)				\
-  do {                                                                     \
-      t = 0;                                                               \
+  do {                                                                  \
+      t = 0;                                                            \
+      float tt = 0.0; 							\
       for (iter_idx = 0; iter_idx < ITERS; iter_idx++)                     \
       {                                                                    \
           for (idx = 0; idx < count; idx++)                                \
@@ -32,7 +34,8 @@
           CCL_CALL(ccl_wait(request));                                     \
           t2 = when();                                                     \
           t += (t2 - t1);                                                  \
-      }                                                                    \
+          tt += (t2 - t1) * (t2 - t1);                                     \
+     }                                                                     \
       ccl_barrier(NULL, NULL);                                             \
       float expected = (size - 1) * ((float)size / 2);                     \
       for (idx = 0; idx < count; idx++)                                    \
@@ -44,7 +47,8 @@
               ASSERT(0, "unexpected value");                               \
           }                                                                \
       }                                                                    \
-      printf("[%zu] %ld bytes - avg %s time: %8.2lf us\n", rank, count*sizeof(float), name, t / ITERS); \
+      tt = sqrt(tt/ITERS - t*t/ITERS/ITERS);                               \
+      printf("[%zu] %ld bytes - avg %s time: %8.2lf ( %8.2lf ) us\n", rank, count*sizeof(float), name, t / ITERS, tt); \
       fflush(stdout);                                                      \
   } while (0)
 

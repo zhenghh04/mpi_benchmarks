@@ -4,7 +4,7 @@
 CC=mpicc
 CXX=mpicxx
 CXXFLAGS=-O3 
-ONECCL_ROOT=/home/hzheng/soft/datascience/oneCCL
+ONECCL_ROOT=/home/hzheng/opt/oneCCL
 allreduce:
 	$(CXX) $(CXXFLAGS) -o allreduce.x allreduce.cpp $(HPCTW)
 
